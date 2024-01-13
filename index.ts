@@ -14,7 +14,7 @@ export const dataProvider = (
   "createMany" | "updateMany" | "deleteMany"
 > => ({
   getList: async ({ resource, pagination, filters, sorters, meta }) => {
-    const url = `${apiUrl}/${resource}`;
+    const url = `${apiUrl}/`;
 
     const { current = 1, pageSize = 10, mode = "server" } = pagination ?? {};
 
@@ -24,22 +24,25 @@ export const dataProvider = (
     const queryFilters = generateFilter(filters);
 
     const query: {
-      _start?: number;
-      _end?: number;
-      _sort?: string;
-      _order?: string;
-    } = {};
+      startindex?: number;
+      count?: number;
+      service: string;
+      request: string;
+      version: string;
+      outputformat: string;
+      typenames: string;
+      sortby?: string;
+    } = {service:'WFS', request: 'GetFeature', version:'2.0.0', outputformat:'application/json', typenames: resource};
 
     if (mode === "server") {
-      query._start = (current - 1) * pageSize;
-      query._end = current * pageSize;
+      query.startindex = (current - 1) * pageSize;
+      query.count = pageSize;
     }
 
     const generatedSort = generateSort(sorters);
     if (generatedSort) {
       const { _sort, _order } = generatedSort;
-      query._sort = _sort.join(",");
-      query._order = _order.join(",");
+      query.sortby = _sort.join(",");
     }
 
     const { data, headers } = await httpClient[requestMethod](
@@ -49,11 +52,14 @@ export const dataProvider = (
       }
     );
 
-    const total = +headers["x-total-count"];
+    const features: any[] = data.features.map((feature:any) => 
+        { const { properties, type, ...rest } = feature; //Remonter d'un niveau les properties, supprimer root.type
+        return { ...rest, ...properties };}
+    )
 
     return {
-      data,
-      total: total || data.length,
+      data: features, 
+      total: data.numberMatched,
     };
   },
 
