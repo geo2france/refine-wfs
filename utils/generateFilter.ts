@@ -2,29 +2,45 @@ import { CrudFilters } from "@refinedev/core";
 import { mapOperator } from "./mapOperator";
 
 export const generateFilter = (filters?: CrudFilters) => {
-  const queryFilters: { [key: string]: string } = {};
+  const array_filter: string[] = []
 
   if (filters) {
     filters.map((filter) => {
-      if (filter.operator === "or" || filter.operator === "and") {
+
+      if (filter.operator !== "or" && filter.operator !== "and" && "field" in filter){ // LogicalFilter
+        const mappedOperator = mapOperator(filter.operator);
+
+        const value = (() => {switch (filter.operator){
+          case "contains":
+          case "containss":
+          case "ncontains":
+          case "ncontainss":
+            return  `'%${filter.value}%'`
+          case "startswith":
+          case "startswiths":
+          case "nstartswith":
+          case "nstartswiths":
+            return  `'${filter.value}%'`
+          case "endswith":
+          case "endswiths":
+          case "nendswith":
+          case "nendswiths":
+            return  `'%${filter.value}'`
+          case "in":
+            return `(${filter.value.map((i:string) => `'${i}'`).join(',')})`
+          default:
+            return `'${filter.value}'`
+        }})()
+        array_filter.push( `${filter.field} ${mappedOperator} ${value}`)
+
+      }else{ //Conditionnal filter
         throw new Error(
-          `[@refinedev/simple-rest]: \`operator: ${filter.operator}\` is not supported. You can create custom data provider. https://refine.dev/docs/api-reference/core/providers/data-provider/#creating-a-data-provider`
-        );
+          `[wfs-data-provider]: Condtionnal filter 'OR' not implemented yet `
+          ); 
       }
 
-      if ("field" in filter) {
-        const { field, operator, value } = filter;
-
-        if (field === "q") {
-          queryFilters[field] = value;
-          return;
-        }
-
-        const mappedOperator = mapOperator(operator);
-        queryFilters[`${field}${mappedOperator}`] = value;
-      }
     });
   }
 
-  return queryFilters;
+  return array_filter.join(' and ');
 };

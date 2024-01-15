@@ -32,6 +32,7 @@ export const dataProvider = (
       outputformat: string;
       typenames: string;
       sortby?: string;
+      cql_filter?: string;
     } = {service:'WFS', request: 'GetFeature', version:'2.0.0', outputformat:'application/json', typenames: resource};
 
     if (mode === "server") {
@@ -45,8 +46,12 @@ export const dataProvider = (
       query.sortby = _sort.join(",");
     }
 
+    if (queryFilters) {
+      query.cql_filter=queryFilters
+    }
+
     const { data, headers } = await httpClient[requestMethod](
-      `${url}?${stringify(query)}&${stringify(queryFilters)}`,
+      `${url}?${stringify(query)}&`,
       {
         headers: headersFromMeta,
       }
