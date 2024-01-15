@@ -26,7 +26,7 @@ export const mapOperator = (operator: CrudOperators): string => {
     case "nstartswith":
     case "nendswith":
       return "not ilike"
-    case "ncontains":
+    case "ncontainss":
     case "nstartswiths":
     case "nendswiths":
       return "not like"
