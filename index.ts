@@ -22,6 +22,7 @@ export const dataProvider = (
     const requestMethod = (method as MethodTypes) ?? "get";
 
     const queryFilters = generateFilter(filters);
+    const generatedSort = generateSort(sorters);
 
     const query: {
       startindex?: number;
@@ -31,19 +32,17 @@ export const dataProvider = (
       version: string;
       outputformat: string;
       typenames: string;
-      sortby?: string;
+      sortby: string;
       cql_filter?: string;
-    } = {service:'WFS', request: 'GetFeature', version:'2.0.0', outputformat:'application/json', typenames: resource};
+    } = {service:'WFS', request: 'GetFeature', sortby : '', version:'2.0.0', outputformat:'application/json', typenames: resource};
 
     if (mode === "server") {
       query.startindex = (current - 1) * pageSize;
       query.count = pageSize;
     }
 
-    const generatedSort = generateSort(sorters);
     if (generatedSort) {
-      const { _sort, _order } = generatedSort;
-      query.sortby = _sort.join(",");
+      query.sortby = generatedSort;
     }
 
     if (queryFilters) {
@@ -51,7 +50,7 @@ export const dataProvider = (
     }
 
     const { data, headers } = await httpClient[requestMethod](
-      `${url}?${stringify(query)}&`,
+      `${url}?${stringify({...query, sortby : undefined})}&sortby=${query.sortby}&`, //"le + de sortby ne doit pas être urlencode"
       {
         headers: headersFromMeta,
       }
