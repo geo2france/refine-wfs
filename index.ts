@@ -1,4 +1,4 @@
-import { DataProvider } from "@refinedev/core";
+import { BaseKey, DataProvider } from "@refinedev/core";
 import { axiosInstance, generateSort, generateFilter } from "./utils";
 import { AxiosInstance } from "axios";
 import { stringify } from "query-string";
@@ -68,16 +68,32 @@ export const dataProvider = (
   },
 
   getMany: async ({ resource, ids, meta }) => {
+    const url = `${apiUrl}`;
+
+    const query: {
+      featureid: BaseKey[];
+      service: string;
+      request: string;
+      version: string;
+      outputformat: string;
+      typenames: string;
+    } = {service:'WFS', request: 'GetFeature', featureid: ids, version:'2.0.0', outputformat:'application/json', typenames: resource};
+
     const { headers, method } = meta ?? {};
     const requestMethod = (method as MethodTypes) ?? "get";
 
     const { data } = await httpClient[requestMethod](
-      `${apiUrl}/${resource}?${stringify({ id: ids })}`,
+      `${url}?${stringify({...query, featureid:ids.join(',')})}`,
       { headers }
     );
 
+    const feature: any[] = data.features.map((feature:any) => 
+      { const { properties, type, ...rest } = feature; //Remonter d'un niveau les properties, supprimer root.type
+      return { ...rest, ...properties };}
+    )
+
     return {
-      data,
+      data : feature,
     };
   },
 
@@ -112,15 +128,32 @@ export const dataProvider = (
   },
 
   getOne: async ({ resource, id, meta }) => {
-    const url = `${apiUrl}/${resource}/${id}`;
+    const url = `${apiUrl}`;
+
+    const query: {
+      featureid: BaseKey;
+      service: string;
+      request: string;
+      version: string;
+      outputformat: string;
+      typenames: string;
+    } = {service:'WFS', request: 'GetFeature', featureid: id, version:'2.0.0', outputformat:'application/json', typenames: resource};
 
     const { headers, method } = meta ?? {};
     const requestMethod = (method as MethodTypes) ?? "get";
 
-    const { data } = await httpClient[requestMethod](url, { headers });
+    const { data } = await httpClient[requestMethod](
+      `${url}?${stringify(query)}`,
+      { headers }
+    );
+
+    const feature = (() => {
+        { const { properties, type, ...rest } = data.features[0]; //Remonter d'un niveau les properties, supprimer root.type
+        return { ...rest, ...properties };}
+    })()
 
     return {
-      data,
+      data : feature,
     };
   },
 
