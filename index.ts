@@ -21,7 +21,7 @@ export const dataProvider = (
     const { headers: headersFromMeta, method } = meta ?? {};
     const requestMethod = (method as MethodTypes) ?? "get";
 
-    const queryFilters = generateFilter(filters);
+    const {cql_filter:queryFilters, bbox} = generateFilter(filters);
     const generatedSort = generateSort(sorters);
 
     const query: {
@@ -34,6 +34,7 @@ export const dataProvider = (
       typenames: string;
       sortby: string;
       cql_filter?: string;
+      bbox?:string;
     } = {service:'WFS', request: 'GetFeature', sortby : '', version:'2.0.0', outputformat:'application/json', typenames: resource};
 
     if (mode === "server") {
@@ -47,6 +48,10 @@ export const dataProvider = (
 
     if (queryFilters) {
       query.cql_filter=queryFilters
+    }
+
+    if (bbox !==''){
+      query.bbox=bbox
     }
 
     const { data, headers } = await httpClient[requestMethod](
