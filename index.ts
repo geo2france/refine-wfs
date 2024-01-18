@@ -11,7 +11,7 @@ export const dataProvider = (
   httpClient: AxiosInstance = axiosInstance
 ): Omit<
   Required<DataProvider>,
-  "createMany" | "updateMany" | "deleteMany" | "create" | "update" | "deleteOne" | "custom"
+  "createMany" | "updateMany" | "deleteMany" 
 > => ({
   getList: async ({ resource, pagination, filters, sorters, meta }) => {
     const url = `${apiUrl}/`;
@@ -137,4 +137,35 @@ export const dataProvider = (
     return apiUrl;
   },
 
+  create: async ({ resource, variables, meta }) => {
+    throw new Error(
+      `[wfs-data-provider]: create operation not supported`
+      );
+  },
+
+  update: async ({ resource, id, variables, meta }) => {
+    throw new Error(
+      `[wfs-data-provider]: update operation not supported`
+      );
+  },
+
+  deleteOne: async ({ resource, id, variables, meta }) => {
+    throw new Error(
+      `[wfs-data-provider]: delete operation not supported`
+      );
+  },
+
+  custom: async ({
+    url,
+    method,
+    filters,
+    sorters,
+    payload,
+    query,
+    headers,
+  }) => {
+    throw new Error(
+      `[wfs-data-provider]: custom query operation not supported`
+      ); 
+  }
 });
