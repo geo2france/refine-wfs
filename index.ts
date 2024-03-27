@@ -4,6 +4,7 @@ import { AxiosInstance } from "axios";
 import { stringify } from "query-string";
 
 type MethodTypes = "get" | "delete" | "head" | "options";
+//@ts-ignore
 type MethodTypesWithBody = "post" | "put" | "patch";
 
 export const dataProvider = (
@@ -53,7 +54,7 @@ export const dataProvider = (
     if (bbox !==''){
       query.bbox=bbox
     }
-
+    //@ts-ignore
     const { data, headers } = await httpClient[requestMethod](
       `${url}?${stringify({...query, sortby : undefined})}&sortby=${query.sortby}&`, //"le + de sortby ne doit pas être urlencode"
       {
