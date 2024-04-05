@@ -69,6 +69,7 @@ export const dataProvider = (
 
     return {
       data: features, 
+      geojson:data,
       total: data.numberMatched,
     };
   },
