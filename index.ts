@@ -37,8 +37,9 @@ export const dataProvider = (
       cql_filter?: string;
       bbox?:string;
       srsname?:string;
+      propertyname?:string;
     } = {service:'WFS', request: 'GetFeature', sortby : '', version:'2.0.0', outputformat:'application/json', typenames: resource,
-    srsname:meta?.srsname};
+    srsname:meta?.srsname, propertyname:meta?.properties?.join(',')};
 
     if (mode === "server") {
       query.startindex = (current - 1) * pageSize;
