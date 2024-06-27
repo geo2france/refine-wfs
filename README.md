@@ -4,6 +4,18 @@
 
 Tested with WFS 2.0.0 and geoserver.
 
+## Installation
+
+```bash
+npm install https://github.com/geo2france/refine-wfs.git
+```
+
+```typescript
+import {dataProvider as wfsDataProvider} from "refine-wfs";
+```
+
+Example : https://github.com/geo2france/odema-dashboard/blob/main/src/App.tsx
+
 ## CRUD
 
 Only read operations are supported (pagination, sorters, getlist, getone, getmany).
