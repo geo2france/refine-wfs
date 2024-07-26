@@ -1,5 +1,8 @@
 # wfs-data-provider
 
+> [!IMPORTANT]  
+> Le fournisseur est maintenant intégré dans le projet https://github.com/geo2france/g2f-dashboard/
+
 [WFS](https://www.ogc.org/standard/wfs/) data provider for [refine](https://github.com/refinedev/refine).
 
 Tested with WFS 2.0.0 and geoserver.
